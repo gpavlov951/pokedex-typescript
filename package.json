@@ -1,0 +1,29 @@
+{
+  "name": "pokedex-typescript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx tsc",
+    "start": "node dist/main.js",
+    "dev": "npm run build && npm run start",
+    "test": "vitest --run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gpavlov951/pokedex-typescript.git"
+  },
+  "keywords": [],
+  "author": "Georgi Pavlov",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/gpavlov951/pokedex-typescript/issues"
+  },
+  "homepage": "https://github.com/gpavlov951/pokedex-typescript#readme",
+  "devDependencies": {
+    "@types/node": "^22.15.18",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3"
+  }
+}
