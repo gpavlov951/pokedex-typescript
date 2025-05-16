@@ -28,7 +28,7 @@ export function startREPL() {
 
     if (!cmd) {
       console.log(
-        `Unknown command: ${command}. Type "help" for a list of commands.`
+        `Unknown command: "${command}". Type "help" for a list of commands.`
       );
       rl.prompt();
       return;
