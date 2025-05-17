@@ -34,6 +34,7 @@ export async function commandMapForward(state: State) {
   state.nextLocationsURL = locations.next;
   state.prevLocationsURL = locations.previous;
 
+  console.log("Maps:");
   for (const loc of locations.results) {
     console.log(loc.name);
   }
@@ -49,6 +50,7 @@ export async function commandMapBack(state: State) {
   state.nextLocationsURL = locations.next;
   state.prevLocationsURL = locations.previous;
 
+  console.log("Maps:");
   for (const loc of locations.results) {
     console.log(loc.name);
   }

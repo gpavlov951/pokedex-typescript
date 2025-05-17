@@ -9,6 +9,19 @@ export class PokeAPI {
     this.cache = new Cache(5 * 60 * 1000);
   }
 
+  private logRequest(url: string): void {
+    console.log("Loading...");
+    console.log(`Making request to: ${url}`);
+    console.log();
+  }
+
+  private logResponse(url: string, startTime: number): void {
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    console.log(`Request to ${url} completed in ${duration}ms`);
+    console.log();
+  }
+
   async fetchLocations(pageURL?: string): Promise<ShallowLocations> {
     const url = pageURL || `${PokeAPI.baseURL}/location-area`;
 
@@ -19,6 +32,9 @@ export class PokeAPI {
     }
 
     try {
+      this.logRequest(url);
+      const startTime = Date.now();
+
       const resp = await fetch(url);
 
       if (!resp.ok) {
@@ -26,6 +42,8 @@ export class PokeAPI {
       }
 
       const locations: ShallowLocations = await resp.json();
+
+      this.logResponse(url, startTime);
 
       // Cache the response
       this.cache.add(url, locations);
@@ -46,6 +64,9 @@ export class PokeAPI {
     }
 
     try {
+      this.logRequest(url);
+      const startTime = Date.now();
+
       const resp = await fetch(url);
 
       if (!resp.ok) {
@@ -53,6 +74,8 @@ export class PokeAPI {
       }
 
       const location: Location = await resp.json();
+
+      this.logResponse(url, startTime);
 
       // Cache the response
       this.cache.add(url, location);
