@@ -1,9 +1,13 @@
 import { createInterface, type Interface } from "node:readline";
 import { Commands, getCommands } from "./commands.js";
+import { PokeAPI } from "./pokeapi.js";
 
 export type State = {
   readline: Interface;
   commands: Commands;
+  pokeAPI: PokeAPI;
+  nextLocationsURL: string;
+  prevLocationsURL: string;
 };
 
 export function initState(): State {
@@ -13,10 +17,11 @@ export function initState(): State {
     prompt: "Pokedex > ",
   });
 
-  const commands = getCommands();
-
   return {
     readline: rl,
-    commands: commands,
+    commands: getCommands(),
+    pokeAPI: new PokeAPI(),
+    nextLocationsURL: "",
+    prevLocationsURL: "",
   };
 }

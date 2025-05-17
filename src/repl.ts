@@ -5,28 +5,33 @@ export function cleanInput(input: string): string[] {
   return input.toLowerCase().trim().split(" ").filter(Boolean);
 }
 
-export function startREPL({ readline: rl, commands }: State) {
-  rl.prompt();
+export async function startREPL(state: State) {
+  state.readline.prompt();
 
-  rl.on("line", (input) => {
+  state.readline.on("line", async (input) => {
     const parseInput = cleanInput(input);
     if (parseInput.length === 0) {
-      rl.prompt();
+      state.readline.prompt();
       return;
     }
 
     const command = parseInput[0];
-    const cmd = commands[command as Command];
+    const cmd = state.commands[command as Command];
 
     if (!cmd) {
       console.log(
         `Unknown command: "${command}". Type "help" for a list of commands.`
       );
-      rl.prompt();
+      state.readline.prompt();
       return;
     }
 
-    cmd.callback({ readline: rl, commands: commands });
-    rl.prompt();
+    try {
+      await cmd.callback(state);
+    } catch (e) {
+      console.log((e as Error).message);
+    }
+
+    state.readline.prompt();
   });
 }
