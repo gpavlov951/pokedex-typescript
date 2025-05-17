@@ -1,18 +1,21 @@
+import { State } from "./state.js";
+
 export type Command = "exit" | "help";
-type Commands = Record<Command, CLICommand<Command>>;
+export type Commands = Record<Command, CLICommand<Command>>;
 
 type CLICommand<T extends Command> = {
   name: T;
   description: string;
-  callback: (commands: Record<T, CLICommand<T>>) => void;
+  callback: (state: State) => void;
 };
 
-function commandExit() {
+function commandExit({ readline }: State) {
   console.log("Closing the Pokedex... Goodbye!");
+  readline.close();
   process.exit(0);
 }
 
-function commandHelp(commands: Commands) {
+function commandHelp({ commands }: State) {
   console.log();
   console.log("Welcome to the Pokedex!");
   console.log("Usage:");
