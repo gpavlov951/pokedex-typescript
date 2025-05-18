@@ -1,21 +1,21 @@
 import { State } from "./state.js";
 
-export type Command = "exit" | "help" | "map" | "mapb";
+export type Command = "exit" | "help" | "map" | "mapb" | "explore";
 export type Commands = Record<Command, CLICommand<Command>>;
 
 type CLICommand<T extends Command> = {
   name: T;
   description: string;
-  callback: (state: State) => Promise<void>;
+  callback: (state: State, ...args: string[]) => Promise<void>;
 };
 
-async function commandExit({ readline }: State) {
+async function commandExit({ readline }: State): Promise<void> {
   console.log("Closing the Pokedex... Goodbye!");
   readline.close();
   process.exit(0);
 }
 
-async function commandHelp({ commands }: State) {
+async function commandHelp({ commands }: State): Promise<void> {
   console.log();
   console.log("Welcome to the Pokedex!");
   console.log("Usage:");
@@ -28,19 +28,18 @@ async function commandHelp({ commands }: State) {
   console.log();
 }
 
-export async function commandMapForward(state: State) {
+export async function commandMapForward(state: State): Promise<void> {
   const locations = await state.pokeAPI.fetchLocations(state.nextLocationsURL);
 
   state.nextLocationsURL = locations.next;
   state.prevLocationsURL = locations.previous;
 
-  console.log("Maps:");
   for (const loc of locations.results) {
     console.log(loc.name);
   }
 }
 
-export async function commandMapBack(state: State) {
+export async function commandMapBack(state: State): Promise<void> {
   if (!state.prevLocationsURL) {
     throw new Error("You're on the first page");
   }
@@ -50,9 +49,27 @@ export async function commandMapBack(state: State) {
   state.nextLocationsURL = locations.next;
   state.prevLocationsURL = locations.previous;
 
-  console.log("Maps:");
   for (const loc of locations.results) {
     console.log(loc.name);
+  }
+}
+
+export async function commandExplore(
+  state: State,
+  ...args: string[]
+): Promise<void> {
+  if (args.length !== 1) {
+    throw new Error("Please provide a location area name");
+  }
+
+  const locationName = args[0];
+  console.log(`Exploring ${locationName}...`);
+
+  const location = await state.pokeAPI.fetchLocation(locationName);
+
+  console.log("Found Pokemon:");
+  for (const encounter of location.pokemon_encounters) {
+    console.log(` - ${encounter.pokemon.name}`);
   }
 }
 
@@ -77,6 +94,11 @@ export function getCommands(): Commands {
       name: "mapb",
       description: "Get the previous page of locations",
       callback: commandMapBack,
+    },
+    explore: {
+      name: "explore",
+      description: "Explore a location area to find Pokemon",
+      callback: commandExplore,
     },
   };
 }
