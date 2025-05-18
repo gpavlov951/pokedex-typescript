@@ -7,7 +7,8 @@ export type Command =
   | "mapb"
   | "explore"
   | "catch"
-  | "inspect";
+  | "inspect"
+  | "pokedex";
 export type Commands = Record<Command, CLICommand<Command>>;
 
 type CLICommand<T extends Command> = {
@@ -141,6 +142,20 @@ export async function commandInspect(
   }
 }
 
+export async function commandPokedex(state: State): Promise<void> {
+  const caughtPokemon = Object.keys(state.pokedex);
+
+  if (caughtPokemon.length === 0) {
+    console.log("Your Pokedex is empty. Go catch some Pokemon!");
+    return;
+  }
+
+  console.log("Your Pokedex:");
+  for (const name of caughtPokemon) {
+    console.log(` - ${name}`);
+  }
+}
+
 export function getCommands(): Commands {
   return {
     exit: {
@@ -177,6 +192,11 @@ export function getCommands(): Commands {
       name: "inspect",
       description: "Inspect a caught Pokemon's details",
       callback: commandInspect,
+    },
+    pokedex: {
+      name: "pokedex",
+      description: "List all caught Pokemon",
+      callback: commandPokedex,
     },
   };
 }
