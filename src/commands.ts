@@ -1,6 +1,6 @@
 import { State } from "./state.js";
 
-export type Command = "exit" | "help" | "map" | "mapb" | "explore";
+export type Command = "exit" | "help" | "map" | "mapb" | "explore" | "catch";
 export type Commands = Record<Command, CLICommand<Command>>;
 
 type CLICommand<T extends Command> = {
@@ -73,6 +73,36 @@ export async function commandExplore(
   }
 }
 
+export async function commandCatch(
+  state: State,
+  ...args: string[]
+): Promise<void> {
+  if (args.length !== 1) {
+    throw new Error("Please provide a Pokemon name");
+  }
+
+  const pokemonName = args[0].toLowerCase();
+  console.log(`Throwing a Pokeball at ${pokemonName}...`);
+
+  try {
+    const pokemon = await state.pokeAPI.fetchPokemon(pokemonName);
+
+    // Calculate catch probability based on base experience
+    // Higher base experience = lower catch chance
+    const catchChance = Math.max(0.1, 1 - pokemon.base_experience / 255);
+    const caught = Math.random() < catchChance;
+
+    if (caught) {
+      console.log(`${pokemonName} was caught!`);
+      state.pokedex[pokemonName] = pokemon;
+    } else {
+      console.log(`${pokemonName} escaped!`);
+    }
+  } catch (e) {
+    console.error((e as Error).message);
+  }
+}
+
 export function getCommands(): Commands {
   return {
     exit: {
@@ -99,6 +129,11 @@ export function getCommands(): Commands {
       name: "explore",
       description: "Explore a location area to find Pokemon",
       callback: commandExplore,
+    },
+    catch: {
+      name: "catch",
+      description: "Try to catch a Pokemon by name",
+      callback: commandCatch,
     },
   };
 }

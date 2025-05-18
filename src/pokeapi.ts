@@ -1,4 +1,5 @@
 import { Cache } from "./pokecache.js";
+import { Pokemon } from "./state.js";
 
 export class PokeAPI {
   private static readonly baseURL = "https://pokeapi.co/api/v2";
@@ -25,7 +26,6 @@ export class PokeAPI {
   async fetchLocations(pageURL?: string): Promise<ShallowLocations> {
     const url = pageURL || `${PokeAPI.baseURL}/location-area`;
 
-    // Check cache first
     const cachedData = this.cache.get<ShallowLocations>(url);
     if (cachedData) {
       return cachedData;
@@ -45,7 +45,6 @@ export class PokeAPI {
 
       this.logResponse(url, startTime);
 
-      // Cache the response
       this.cache.add(url, locations);
 
       return locations;
@@ -57,7 +56,6 @@ export class PokeAPI {
   async fetchLocation(locationName: string): Promise<Location> {
     const url = `${PokeAPI.baseURL}/location-area/${locationName}`;
 
-    // Check cache first
     const cachedData = this.cache.get<Location>(url);
     if (cachedData) {
       return cachedData;
@@ -77,13 +75,44 @@ export class PokeAPI {
 
       this.logResponse(url, startTime);
 
-      // Cache the response
       this.cache.add(url, location);
 
       return location;
     } catch (e) {
       throw new Error(
         `Error fetching location '${locationName}': ${(e as Error).message}`
+      );
+    }
+  }
+
+  async fetchPokemon(name: string): Promise<Pokemon> {
+    const url = `${PokeAPI.baseURL}/pokemon/${name.toLowerCase()}`;
+
+    const cachedData = this.cache.get<Pokemon>(url);
+    if (cachedData) {
+      return cachedData;
+    }
+
+    try {
+      this.logRequest(url);
+      const startTime = Date.now();
+
+      const resp = await fetch(url);
+
+      if (!resp.ok) {
+        throw new Error(`${resp.status} ${resp.statusText}`);
+      }
+
+      const pokemon: Pokemon = await resp.json();
+
+      this.logResponse(url, startTime);
+
+      this.cache.add(url, pokemon);
+
+      return pokemon;
+    } catch (e) {
+      throw new Error(
+        `Error fetching Pokemon '${name}': ${(e as Error).message}`
       );
     }
   }
