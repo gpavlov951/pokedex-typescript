@@ -1,11 +1,6 @@
 import { createInterface, type Interface } from "node:readline";
-import { Commands, getCommands } from "./commands.js";
-import { PokeAPI } from "./pokeapi.js";
-
-export type Pokemon = {
-  name: string;
-  base_experience: number;
-};
+import { type Commands, getCommands } from "./commands.js";
+import { PokeAPI, type Pokemon } from "./pokeapi.js";
 
 export type State = {
   readline: Interface;
